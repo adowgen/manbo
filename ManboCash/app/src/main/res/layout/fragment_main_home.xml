@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/corlor_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </FrameLayout>
+
+
+
+    <ImageView
+        android:id="@+id/main_lanking_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:background="@drawable/main_lanking_btn"
+        app:layout_constraintEnd_toStartOf="@+id/main_logo"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/main_logo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/main_logo"
+        app:layout_constraintEnd_toStartOf="@+id/main_weather_btn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_weight="0.8"
+        app:layout_constraintStart_toEndOf="@+id/main_lanking_btn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/main_weather_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/main_weather"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_weight="0.2"
+        app:layout_constraintStart_toEndOf="@+id/main_logo"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/greetingTV1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="안녕하세요. jjh0606 님"
+        android:textSize="20sp"
+        android:textColor="@color/corlor_black"
+        android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toTopOf="@id/greetingTV2_1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_logo" />
+
+    <TextView
+        android:id="@+id/greetingTV2_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="오늘은"
+        android:textSize="16sp"
+        android:textColor="@color/corlor_black"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/greetingTV2_2"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV1"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+
+    <TextView
+        android:id="@+id/greetingTV2_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3,627"
+        android:textSize="34sp"
+        android:textColor="@color/corlor_black"
+        app:layout_constraintLeft_toRightOf="@id/greetingTV2_1"
+        app:layout_constraintRight_toLeftOf="@id/greetingTV2_3"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV1" />
+
+
+    <TextView
+        android:id="@+id/greetingTV2_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="걸음 걸으셨네요!"
+        android:textSize="16sp"
+        android:textColor="@color/corlor_black"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"
+        app:layout_constraintLeft_toRightOf="@id/greetingTV2_2"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV1" />
+
+
+    <ImageView
+        android:id="@+id/status_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fragment_home_uparrow"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/status_distance_tv"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV2_2" />
+
+    <TextView
+        android:id="@+id/status_distance_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3.2 km"
+        android:textSize="15sp"
+        android:textColor="@color/corlor_black"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toRightOf="@id/status_distance"
+        app:layout_constraintRight_toLeftOf="@id/status_time"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV2_2" />
+
+
+    <ImageView
+        android:id="@+id/status_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fragment_home_clock"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintRight_toLeftOf="@id/status_time_tv"
+        app:layout_constraintLeft_toRightOf="@id/status_distance_tv"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV2_2" />
+
+    <TextView
+        android:id="@+id/status_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="127 분"
+        android:textSize="15sp"
+        android:textColor="@color/corlor_black"
+        android:layout_marginTop="5dp"
+        app:layout_constraintRight_toLeftOf="@id/status_calori"
+        app:layout_constraintLeft_toRightOf="@id/status_time"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV2_2" />
+
+    <ImageView
+        android:id="@+id/status_calori"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fragment_home_fire"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintRight_toLeftOf="@id/status_calori_tv"
+        app:layout_constraintLeft_toRightOf="@id/status_time_tv"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV2_2" />
+
+    <TextView
+        android:id="@+id/status_calori_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="215 cal"
+        android:textSize="15sp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/red_fire"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/status_calori"
+        app:layout_constraintTop_toBottomOf="@id/greetingTV2_2" />
+
+
+    <ImageView
+        android:id="@+id/home_walkbg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_time" />
+
+
+    <ImageView
+        android:id="@+id/home_walking_man"
+        android:layout_width="30.67dp"
+        android:layout_height="50dp"
+        app:layout_constraintRight_toRightOf="@id/home_walkbg"
+        app:layout_constraintLeft_toLeftOf="@id/home_walkbg"
+        app:layout_constraintBottom_toTopOf="@id/home_gage"
+        app:layout_constraintHorizontal_bias="0.37"
+        />
+
+
+    <ImageView
+        android:id="@+id/home_gage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fragment_home_gage"
+        android:layout_marginTop="2dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_walkbg" />
+
+    <ImageView
+        android:id="@+id/home_cashbg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fragment_home_cashbg"
+        android:layout_marginTop="10dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_gage" />
+
+
+    <TextView
+        android:id="@+id/home_cash_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1,951"
+        android:textSize="26sp"
+        android:textColor="@color/home_cash_"
+        android:fontFamily="@font/spoqa_han_sans_bold"
+        app:layout_constraintLeft_toLeftOf="@id/home_cashbg"
+        app:layout_constraintRight_toLeftOf="@id/home_cash_cash"
+        app:layout_constraintTop_toTopOf="@id/home_cashbg"
+        app:layout_constraintBottom_toBottomOf="@id/home_cashbg"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_bias="0.9"
+
+        />
+
+    <TextView
+        android:id="@+id/home_cash_cash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="캐시"
+        android:textSize="15sp"
+        android:textColor="@color/home_cash_"
+        android:layout_marginLeft="10dp"
+        android:fontFamily="@font/spoqa_han_sans_bold"
+        app:layout_constraintLeft_toRightOf="@id/home_cash_tv"
+        app:layout_constraintRight_toRightOf="@id/home_cashbg"
+        app:layout_constraintTop_toTopOf="@id/home_cashbg"
+        app:layout_constraintBottom_toBottomOf="@id/home_cashbg"
+        app:layout_constraintHorizontal_bias="0.9"
+
+        />
+
+    <com.skyfishjy.library.RippleBackground
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/heart_ripple_content"
+        app:rb_color="#F1C1C2"
+        app:rb_radius="17dp"
+        app:rb_rippleAmount="3"
+        app:rb_duration="4000"
+        app:rb_scale="6"
+        app:layout_constraintTop_toBottomOf="@+id/home_cashbg"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/centerImage"
+            android:src="@drawable/fragment_home_heart_red"/>
+    </com.skyfishjy.library.RippleBackground>
+
+
+    <TextView
+        android:id="@+id/home_heart_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="22dp"
+        android:textColor="@color/corlor_white"
+        android:fontFamily="@font/spoqa_han_sans_bold"
+        app:layout_constraintLeft_toLeftOf="@id/heart_ripple_content"
+        app:layout_constraintRight_toRightOf="@id/heart_ripple_content"
+        app:layout_constraintTop_toTopOf="@id/heart_ripple_content"
+        app:layout_constraintBottom_toBottomOf="@id/heart_ripple_content"
+
+        />
+
+
+    <TextView
+        android:id="@+id/home_decription_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="클릭하면 캐시를 받을 수 있어요!"
+        android:textSize="15sp"
+        android:textColor="@color/red_fire"
+        android:fontFamily="@font/spoqa_han_sans_bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/heart_ripple_content"
+        />
+
+    <TextView
+        android:id="@+id/home_plusone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+1"
+        android:textSize="20dp"
+        android:textColor="@color/dark_gray_press"
+        android:fontFamily="@font/spoqa_han_sans_bold"
+        app:layout_constraintLeft_toLeftOf="@+id/heart_ripple_content"
+        app:layout_constraintRight_toRightOf="@+id/heart_ripple_content"
+        app:layout_constraintTop_toTopOf="@+id/heart_ripple_content"
+        app:layout_constraintBottom_toBottomOf="@+id/heart_ripple_content"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintHorizontal_bias="0.7"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
