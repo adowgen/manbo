@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -61,6 +62,9 @@ dependencies {
     implementation 'com.facebook.android:facebook-login:[5,6)'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
 
+    //구글광고
+    implementation 'com.google.firebase:firebase-ads:17.2.0'
+
 
 
     // kakao sdk
@@ -75,9 +79,10 @@ dependencies {
     //chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'
 
-
     //Phoenix Pull-to-Refresh
     implementation 'com.yalantis:phoenix:1.2.3'
+
+
 
 }
 

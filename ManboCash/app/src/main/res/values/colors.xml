@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    출처: https://mommoo.tistory.com/47 [개발자로 홀로 서기]
-
     <color name="color_gray_ChryslerWhite_alpha70">#B3f0f0f0</color>
     <color name="color_gray_ChryslerWhite">#f0f0f0</color>
     <color name="color_gray">#c3c3c2</color>
@@ -12,6 +10,7 @@
     <color name="color_ggray">#7a7a7a</color>
     <color name="corlor_white">#ffffff</color>
     <color name="corlor_black">#000000</color>
+    <color name="corlor_black_alpha80">#CC000000</color>
 
     <color name="color_common">#3e63b4</color>
 

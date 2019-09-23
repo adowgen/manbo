@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,10 +26,6 @@ public class storeFragment extends Fragment {
 
         mStoreWebView = (WebView) rootView.findViewById(R.id.store_webview);
 
-        mStoreWebView.loadUrl("https://color-world-9fef9.firebaseapp.com");
-
-
-
         mStoreWebView.clearCache(true);
 
         mStoreWebView.getSettings().setJavaScriptEnabled(true);
@@ -40,6 +38,10 @@ public class storeFragment extends Fragment {
         mStoreWebView.getSettings().setLoadWithOverviewMode(true);
         mStoreWebView.getSettings().setPluginState(WebSettings.PluginState.ON);
         mStoreWebView.getSettings().setDomStorageEnabled(true);
+        mStoreWebView.setWebChromeClient(new WebChromeClient());
+        mStoreWebView.setWebViewClient(new WebViewClient());
+
+        mStoreWebView.loadUrl("https://dev.giftting.co.kr:4433/gate.jsp?mdcode=testw&type=M");
 
         return rootView;
     }
