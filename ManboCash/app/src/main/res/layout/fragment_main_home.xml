@@ -288,8 +288,8 @@
         />
 
     <com.skyfishjy.library.RippleBackground
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:id="@+id/heart_ripple_content"
         app:rb_color="#F1C1C2"
         app:rb_radius="17dp"
@@ -329,7 +329,7 @@
         android:id="@+id/home_decription_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="클릭하면 캐시를 받을 수 있어요!"
+        android:text="탭을 하면 코인으로 전환됩니다!"
         android:textSize="15sp"
         android:textColor="@color/red_fire"
         android:fontFamily="@font/spoqa_han_sans_bold"

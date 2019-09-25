@@ -10,6 +10,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -66,6 +67,7 @@ public class homeFragment extends Fragment implements SensorEventListener {
 
     //counter
     private ImageView heart_imageView;
+    private TextView heart_coinCount_text, mCash, mTapDescription;
 
 
     @Nullable
@@ -114,6 +116,41 @@ public class homeFragment extends Fragment implements SensorEventListener {
 
         initPlusOneAndAnimation(rootView);
 
+        mCash = (TextView) rootView.findViewById(R.id.home_cash_tv);
+        exchangeCash(0);
+
+
+        //최초 설치시에만 보이도록 수정
+        final Animation alphaZero = AnimationUtils.loadAnimation(getContext(), R.anim.alpah_zero);
+        alphaZero.setRepeatMode(1);
+        alphaZero.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mTapDescription.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mTapDescription.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        mTapDescription = (TextView) rootView.findViewById(R.id.home_decription_tv);
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mTapDescription.startAnimation(alphaZero);
+            }
+        }, 10000);
+
+
 
         return rootView;
     }
@@ -126,20 +163,22 @@ public class homeFragment extends Fragment implements SensorEventListener {
 
         mOldCount = (int) event.values[0];
 
+        Log.e("step", "mOldCount : " + mOldCount);
+
         //자정 이후 리셋되면 reset = false
         if (!mSp.getBoolean("reset", false)) {
-            mSp.edit().putInt("oldCount", mOldCount).apply();
+            mSp.edit().putInt("appOsCount", mOldCount).apply();
             mSp.edit().putBoolean("reset", true).apply(); //자정 지나서 서버에 걸음수가 등록되면 reset false 부분 넣어야됨.
         }
 
-        int oldCount = mSp.getInt("oldCount", 0);
+        int oldCount = mSp.getInt("appOsCount", 0);
 
-        //step counter 센서는 핸드폰을 껐다가 키면 0가 된다. 폰에 저장된 oldCount 보다 센서 카운트가 작으면 껐다가 다시 킨걸로 간주하고 재설정 해줌
+        //step counter 센서는 핸드폰을 껐다가 키면 0가 된다. 폰에 저장된 appOsCount 보다 센서 카운트가 작으면 껐다가 다시 킨걸로 간주하고 재설정 해줌
         if (mOldCount > oldCount) {
             mCurrentCount = mOldCount - oldCount;
-        }else {
-            mSp.edit().putInt("oldCount", mOldCount).apply();
-            int newOldCount = mSp.getInt("oldCount", 0);
+        } else {
+            mSp.edit().putInt("appOsCount", mOldCount).apply();
+            int newOldCount = mSp.getInt("appOsCount", 0);
             mCurrentCount = mOldCount - newOldCount;
         }
 
@@ -161,17 +200,60 @@ public class homeFragment extends Fragment implements SensorEventListener {
         }
 
 
-        //여기서 하면 안됨;;;;
-        int heartCount = mCurrentCount/5;
-        changeStatus_heart(mCurrentCount);
 
-        Log.e("ios", "2900/10000 = " + 2900.f / 10000.f + "    , walkCountBias/10000.f = " + walkCountBias / 10000.f + "    , walkCountBias = " + walkCountBias);
+        /*
+         * 전환가능한 걸음수만 계산 및 하트 카운트 업데이트
+         *
+         * convertedCount : 전환한 걸음수
+         *
+         * convertabelCount = mCurrentCount - convertedCount : 전환 가능한 걸음수
+         *
+         * convertingCoin = convertableCount / 5 : 코인으로 전환
+         *
+         * convertedCount = convertedCount + (convertableCount - convertableCount%5) : 전환된 걸음수 업데이트
+         *
+         * heartCoinCount = heartCoinCount + convertingCoin : 하트 카운트 업데이트
+         *
+         * mCurrentCount < convertedCount || mCurrent == 0 : 핸드폰을 리부팅해서 현재 카운트가 0 이니까 convertedCount = 0 으로 업데이트
+         *
+         *
+         * */
+
+
+        int convertedCount = mSp.getInt("convertedCount", 0);
+
+        if (mCurrentCount < convertedCount || mCurrentCount == 0)
+            mSp.edit().putInt("convertedCount", 0).apply();
+
+        int convertableCount = mCurrentCount - convertedCount;
+        int convertingCoin = (int) Math.floor(convertableCount / 5); // n.0 으로 나와서 캐스팅
+
+
+        Log.e("step", "\n mCurrentCount : " + mCurrentCount + "\n convertedCount : " + convertedCount + "\n convertableCount : " + convertableCount + "\n convertingCoin : " + convertingCoin);
+
+
+        convertedCount += (convertableCount - convertableCount % 5);
+        mSp.edit().putInt("convertedCount", convertedCount).apply();
+
+        int heartCoin = mSp.getInt("heartCoinCount", 0);
+
+        Log.e("step", "\n 1 - heartCoin : " + heartCoin);
+
+        heartCoin += convertingCoin;
+
+        Log.e("step", "\n 2 - heartCoin : " + heartCoin);
+
+        mSp.edit().putInt("heartCoinCount", heartCoin).apply();
+
+
+        changeStatus_heart(heartCoin);
+
+//        Log.e("ios", "2900/10000 = " + 2900.f / 10000.f + "    , walkCountBias/10000.f = " + walkCountBias / 10000.f + "    , walkCountBias = " + walkCountBias);
 
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
 
     }
 
@@ -195,6 +277,9 @@ public class homeFragment extends Fragment implements SensorEventListener {
     }
 
     public void initPlusOneAndAnimation(View view) {
+
+        heart_coinCount_text = (TextView) view.findViewById(R.id.home_heart_tv);
+
         final Animation upAnimation_1 = AnimationUtils.loadAnimation(getContext(), R.anim.ani);
         upAnimation_1.setRepeatMode(1);
         upAnimation_1.setAnimationListener(new Animation.AnimationListener() {
@@ -317,48 +402,74 @@ public class homeFragment extends Fragment implements SensorEventListener {
             @Override
             public void onClick(View view) {
                 if (isClickEnabel) {
-                    if (currentPlusOne == 1) {
-                        mPlusOne_1.startAnimation(upAnimation_1);
-                        currentPlusOne = 2;
-                    } else if (currentPlusOne == 2) {
-                        mPlusOne_2.startAnimation(upAnimation_2);
-                        currentPlusOne = 3;
-                    } else if (currentPlusOne == 3) {
-                        mPlusOne_3.startAnimation(upAnimation_3);
-                        currentPlusOne = 4;
-                    } else if (currentPlusOne == 4) {
-                        mPlusOne_4.startAnimation(upAnimation_4);
-                        currentPlusOne = 5;
-                    } else if (currentPlusOne == 5) {
-                        mPlusOne_5.startAnimation(upAnimation_5);
-                        currentPlusOne = 1;
-                        ((MainActivity) MainActivity.mStaticContext).openadverstising();
-                        enableBtns(false);
+                    //카운터에서 코인으로
+
+                    int heartCoin = mSp.getInt("heartCoinCount", 0);
+                    if (heartCoin > 0) {
+                        exchangeCoin(1);
+
+                        if (currentPlusOne == 1) {
+                            mPlusOne_1.startAnimation(upAnimation_1);
+                            currentPlusOne = 2;
+                        } else if (currentPlusOne == 2) {
+                            mPlusOne_2.startAnimation(upAnimation_2);
+                            currentPlusOne = 3;
+                        } else if (currentPlusOne == 3) {
+                            mPlusOne_3.startAnimation(upAnimation_3);
+                            currentPlusOne = 4;
+                        } else if (currentPlusOne == 4) {
+                            mPlusOne_4.startAnimation(upAnimation_4);
+                            currentPlusOne = 5;
+                        } else if (currentPlusOne == 5) {
+                            mPlusOne_5.startAnimation(upAnimation_5);
+                            currentPlusOne = 1;
+                            ((MainActivity) MainActivity.mStaticContext).openadverstising();
+                            enableBtns(false);
+                        }
                     }
                 } else {
                     Log.e("ios", "광고");
+                    //광고가 뜨면 코인으로 전환 : 광고 fail시엔 전환 안됨
                 }
             }
         });
 
-
-        //현재 걸음 계산
-        mCurrentCount = mSp.getInt("currentCount", 0);
-
-
-        changeStatus_heart(mCurrentCount);
-
-
     }
 
+    private void exchangeCoin(int toCoin) {
+        int heartCoin = mSp.getInt("heartCoinCount", 0);
+        heartCoin -= toCoin;
+        mSp.edit().putInt("heartCoinCount", heartCoin).apply();
+        changeStatus_heart(heartCoin);
+
+
+        //캐시 올리는 메서드 작성
+        //광고가 뜨면 코인으로 전환 : 광고 fail시엔 전환 안됨
+    }
+
+    public void exchangeCash(int coin) {
+        int nowCash = mSp.getInt("myCash", 0);
+        nowCash += coin;
+        mCash.setText(String.valueOf(nowCash));
+        mSp.edit().putInt("myCash", nowCash).apply();
+    }
+
+
     public void changeStatus_heart(int heartCount) {
+
+        heart_coinCount_text.setText(String.valueOf(heartCount));
+
         if (heartCount < 5) {
             heart_imageView.setImageResource(R.drawable.fragment_home_heart_gray);
             mRippleBackground.stopRippleAnimation();
+            mTapDescription.setVisibility(View.INVISIBLE);
+
         } else {
             heart_imageView.setImageResource(R.drawable.fragment_home_heart_red);
             mRippleBackground.startRippleAnimation();
         }
+
+
     }
 
     public void enableBtns(boolean enable) {

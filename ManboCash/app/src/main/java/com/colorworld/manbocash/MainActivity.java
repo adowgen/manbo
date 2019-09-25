@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     private AdView mBottomAdView;
     private AdView mRectangleAdView;
 
+    private boolean isAdSuccess = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,18 +128,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
+                isAdSuccess = true;
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 // Code to be executed when an ad request fails.
-
+                isAdSuccess = false;
             }
 
             @Override
             public void onAdOpened() {
                 // Code to be executed when an ad opens an overlay that
                 // covers the screen.
+                isAdSuccess = true;
             }
 
             @Override
@@ -157,22 +161,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        //앱 처음 오픈시 onAdLoaded(),
         mRectangleAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
+//                Log.e("ios", "==============================================mRectangleAdView : onAdLoaded()");
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 // Code to be executed when an ad request fails.
-
+                Log.e("ios", "==============================================mRectangleAdView : onAdFailedToLoad() : " + errorCode);
             }
 
             @Override
             public void onAdOpened() {
                 // Code to be executed when an ad opens an overlay that
                 // covers the screen.
+//                Log.e("ios", "==============================================mRectangleAdView : onAdOpened()");
             }
 
             @Override
@@ -183,12 +191,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdLeftApplication() {
                 // Code to be executed when the user has left the app.
+//                Log.e("ios", "==============================================mRectangleAdView : onAdLeftApplication()");
             }
 
             @Override
             public void onAdClosed() {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
+//                Log.e("ios", "==============================================mRectangleAdView : onAdClosed()");
             }
         });
 
@@ -235,6 +245,9 @@ public class MainActivity extends AppCompatActivity {
                 bottomNavigationView.setAlpha(1.0f);
                 enableBottomNavi(true);
                 ((homeFragment) homeFragment.mStaticHFContext).enableBtns(true);
+
+                if (isAdSuccess)((homeFragment) homeFragment.mStaticHFContext).exchangeCash(1);
+
             }
         });
 
