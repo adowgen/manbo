@@ -59,14 +59,14 @@
         android:id="@+id/greetingTV1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="안녕하세요. jjh0606 님"
         android:textSize="20sp"
         android:textColor="@color/corlor_black"
         android:layout_marginTop="15dp"
         app:layout_constraintBottom_toTopOf="@id/greetingTV2_1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_logo" />
+        app:layout_constraintTop_toBottomOf="@+id/main_logo"
+        app:layout_constraintVertical_chainStyle="packed"/>
 
     <TextView
         android:id="@+id/greetingTV2_1"
@@ -80,7 +80,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/greetingTV2_2"
         app:layout_constraintTop_toBottomOf="@id/greetingTV1"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        app:layout_constraintHorizontal_chainStyle="packed" />
 
 
     <TextView
@@ -288,14 +288,14 @@
         />
 
     <com.skyfishjy.library.RippleBackground
-        android:layout_width="180dp"
-        android:layout_height="180dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:id="@+id/heart_ripple_content"
         app:rb_color="#F1C1C2"
         app:rb_radius="17dp"
         app:rb_rippleAmount="3"
-        app:rb_duration="4000"
-        app:rb_scale="6"
+        app:rb_duration="5000"
+        app:rb_scale="4.5"
         app:layout_constraintTop_toBottomOf="@+id/home_cashbg"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

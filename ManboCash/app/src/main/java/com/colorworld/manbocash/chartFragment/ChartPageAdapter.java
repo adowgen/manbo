@@ -33,28 +33,29 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-public class ChartPageAdapter extends PagerAdapter implements SeekBar.OnSeekBarChangeListener, OnChartValueSelectedListener  {
+public class ChartPageAdapter extends PagerAdapter implements SeekBar.OnSeekBarChangeListener, OnChartValueSelectedListener {
 
-    private Context mContext = null ;
+    private Context mContext = null;
 
     private LineChart chart;
 
+    private TextView mCalendar_date;
 
     public ChartPageAdapter() {
 
     }
 
     public ChartPageAdapter(Context context) {
-        mContext = context ;
+        mContext = context;
     }
 
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = null ;
-
+        View view = null;
 
 
         if (mContext != null) {
@@ -67,12 +68,23 @@ public class ChartPageAdapter extends PagerAdapter implements SeekBar.OnSeekBarC
             initChart(view);
 
 
+            mCalendar_date = (TextView) view.findViewById(R.id.chart_date);
+
+            Calendar cal = Calendar.getInstance();
+
+            int year = cal.get(cal.YEAR);
+            int month = cal.get(cal.MONTH) + 1;
+            int date = cal.get(cal.DATE);
+
+            String currentDate = month + "월  " + date + "일";
+
+            mCalendar_date.setText(currentDate);
         }
 
         // 뷰페이저에 추가.
-        container.addView(view) ;
+        container.addView(view);
 
-        return view ;
+        return view;
     }
 
     @Override
@@ -92,7 +104,6 @@ public class ChartPageAdapter extends PagerAdapter implements SeekBar.OnSeekBarC
 
 
     }
-
 
 
     @SuppressLint("ResourceAsColor")

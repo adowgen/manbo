@@ -12,4 +12,12 @@
 *
 *
 *
+*
+*
+* getSharedPreferences("manboData", MODE_PRIVATE);
+*
+* key : greeting (string) ------------- 메인 인사 텍스트
+*
+*
+*
 * */

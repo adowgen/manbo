@@ -48,6 +48,8 @@ public class homeFragment extends Fragment implements SensorEventListener {
 
     public ImageView walkBg;
 
+    public TextView mGreetingText;
+
     private ImageView mRankBtn, mWalkMan;
     private ConstraintLayout.LayoutParams walkMan_params;
 
@@ -78,6 +80,12 @@ public class homeFragment extends Fragment implements SensorEventListener {
         View rootView = inflater.inflate(R.layout.fragment_main_home, container, false);
 
         mSp = this.getActivity().getSharedPreferences("stepCount", MODE_PRIVATE);
+
+        SharedPreferences dataSp = this.getActivity().getSharedPreferences("manboData", MODE_PRIVATE);
+        String greetingText = dataSp.getString("greeting", "안녕하세요. 반갑습니다!");
+
+        mGreetingText = (TextView) rootView.findViewById(R.id.greetingTV1);
+        mGreetingText.setText(greetingText);
 
         walkBg = (ImageView) rootView.findViewById(R.id.home_walkbg);
         walkBgSizeCheck();
@@ -147,8 +155,14 @@ public class homeFragment extends Fragment implements SensorEventListener {
             @Override
             public void run() {
                 mTapDescription.startAnimation(alphaZero);
+
+
             }
         }, 10000);
+
+
+
+
 
 
 
@@ -470,6 +484,10 @@ public class homeFragment extends Fragment implements SensorEventListener {
         }
 
 
+    }
+
+    public void fetchGreetingText(String str) {
+        mGreetingText.setText(str);
     }
 
     public void enableBtns(boolean enable) {

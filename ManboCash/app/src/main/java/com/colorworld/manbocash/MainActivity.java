@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -30,13 +31,18 @@ import com.colorworld.manbocash.mainFragments.chartFragment;
 import com.colorworld.manbocash.mainFragments.homeFragment;
 import com.colorworld.manbocash.mainFragments.settingFragment;
 import com.colorworld.manbocash.mainFragments.storeFragment;
+import com.colorworld.manbocash.requestPermission.RequestPermission;
 import com.colorworld.manbocash.tutorial.tutorials.TutorialSupportActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,8 +58,12 @@ import java.nio.charset.Charset;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static MainActivity mStaticContext;
 
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private static final String android_version = "android_version";
+    private static final String main_greeting = "main_greeting";
+
+    public static MainActivity mStaticContext;
     public Context mContext;
 
 
@@ -75,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isAdSuccess = false;
 
+    //test
+    private boolean isView = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +108,46 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
 
+
         initAdvertising();
 
 
-        permissionAccess();
+
+        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+        transaction.replace(R.id.frameLayout, mHomeFragment).commitAllowingStateLoss();
+
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(
+                new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        FragmentTransaction transaction = mFragmentManager.beginTransaction();
+                        switch (item.getItemId()) {
+                            case R.id.action_botMenu_home:
+                                Log.e("ios", "action_botMenu_home");
+                                transaction.replace(R.id.frameLayout, mHomeFragment).commitAllowingStateLoss();
+
+                                break;
+                            case R.id.action_botMenu_chart:
+                                Log.e("ios", "action_botMenu_chart");
+                                transaction.replace(R.id.frameLayout, mChartFragment).commitAllowingStateLoss();
+                                break;
+                            case R.id.action_botMenu_stroe:
+                                Log.e("ios", "action_botMenu_stroe");
+                                transaction.replace(R.id.frameLayout, mStoreFragment).commitAllowingStateLoss();
+                                break;
+                            case R.id.action_botMenu_set:
+                                Log.e("ios", "action_botMenu_set");
+                                transaction.replace(R.id.frameLayout, mSettingFragment).commitAllowingStateLoss();
+                                break;
+                        }
+                        return true;
+                    }
+                });
+
+        initFirebaseRemoteConfig();
+
+        requestPermissionActivity();
 
         getWeatherStatus();
 
@@ -108,12 +157,16 @@ public class MainActivity extends AppCompatActivity {
 //        Intent isLogin = new Intent(mContext, Tutorial_LoginActivity.class);
 //        startActivity(isLogin);
 
-        SharedPreferences sp = getSharedPreferences("isFirstRun", MODE_PRIVATE);
-        Log.e("ios", "isFirst running : " + sp.getBoolean("running", false));
-        if (!sp.getBoolean("running", false)) {
-            TutorialSupportActivity.start(this);
-        }
 
+        if (!isView) {
+            SharedPreferences sp = getSharedPreferences("isFirstRun", MODE_PRIVATE);
+            Log.e("ios", "isFirst running : " + sp.getBoolean("running", false));
+            if (!sp.getBoolean("running", false)) {
+                TutorialSupportActivity.start(this);
+            }
+
+            isView = true;
+        }
 
     }
 
@@ -203,39 +256,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        FragmentTransaction transaction = mFragmentManager.beginTransaction();
-        transaction.replace(R.id.frameLayout, mHomeFragment).commitAllowingStateLoss();
-
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        FragmentTransaction transaction = mFragmentManager.beginTransaction();
-                        switch (item.getItemId()) {
-                            case R.id.action_botMenu_home:
-                                Log.e("ios", "action_botMenu_home");
-                                transaction.replace(R.id.frameLayout, mHomeFragment).commitAllowingStateLoss();
-
-                                break;
-                            case R.id.action_botMenu_chart:
-                                Log.e("ios", "action_botMenu_chart");
-                                transaction.replace(R.id.frameLayout, mChartFragment).commitAllowingStateLoss();
-                                break;
-                            case R.id.action_botMenu_stroe:
-                                Log.e("ios", "action_botMenu_stroe");
-                                transaction.replace(R.id.frameLayout, mStoreFragment).commitAllowingStateLoss();
-                                break;
-                            case R.id.action_botMenu_set:
-                                Log.e("ios", "action_botMenu_set");
-                                transaction.replace(R.id.frameLayout, mSettingFragment).commitAllowingStateLoss();
-                                break;
-                        }
-                        return true;
-                    }
-                });
-
-
         mAd_bg = (FrameLayout) findViewById(R.id.ad_bg);
         mAd_bg_x_btn = (ImageView) findViewById(R.id.ad_bg_x);
         mAd_bg_x_btn.setOnClickListener(new View.OnClickListener() {
@@ -246,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 enableBottomNavi(true);
                 ((homeFragment) homeFragment.mStaticHFContext).enableBtns(true);
 
-                if (isAdSuccess)((homeFragment) homeFragment.mStaticHFContext).exchangeCash(1);
+                if (isAdSuccess) ((homeFragment) homeFragment.mStaticHFContext).exchangeCash(1);
 
             }
         });
@@ -301,26 +321,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void permissionAccess() {
-        ActivityCompat.requestPermissions(this, new String[]{
-//                Manifest.permission.CAMERA, //사진
-//                Manifest.permission.CALL_PHONE,  //통화
-//                Manifest.permission.READ_PHONE_STATE,
-//				Manifest.permission.WRITE_CALL_LOG,
-//				Manifest.permission.PROCESS_OUTGOING_CALLS,
-                Manifest.permission.ACCESS_FINE_LOCATION, //위치
-                Manifest.permission.ACCESS_COARSE_LOCATION
-//                Manifest.permission.GET_ACCOUNTS, //주소록
-//                Manifest.permission.WRITE_CONTACTS,
-//                Manifest.permission.READ_CONTACTS,
-//                Manifest.permission.READ_EXTERNAL_STORAGE, //사진 미디어
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//                Manifest.permission.RECORD_AUDIO, //오디오 녹음
-//				Manifest.permission.SEND_SMS, //문자
-//				Manifest.permission.RECEIVE_SMS,
-//				Manifest.permission.READ_SMS,
-//				Manifest.permission.RECEIVE_MMS
-        }, 11111);
+    public void requestPermissionActivity() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                startActivity(new Intent(MainActivity.this, RequestPermission.class));
+
+                return;
+            }
+        }
 
     }
 
@@ -359,5 +369,48 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void initFirebaseRemoteConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(3600)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
+        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_defaults);
+
+        mFirebaseRemoteConfig.fetchAndActivate()
+                .addOnCompleteListener(this, new OnCompleteListener<Boolean>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Boolean> task) {
+                        if (task.isSuccessful()) {
+                            boolean updated = task.getResult();
+                            Log.e("ios", "Config params updated: " + updated);
+                            Log.e("ios", "Fetch and activate succeeded");
+
+
+                        } else {
+                             Log.e("ios", "Fetch failed");
+
+                        }
+                        displayWelcomeMessage();
+                    }
+                });
+    }
+
+
+    public void displayWelcomeMessage() {
+
+        String mainGreeting = mFirebaseRemoteConfig.getString("main_greeting");
+        String andVersion = mFirebaseRemoteConfig.getString("android_version");
+
+        SharedPreferences dataSp = this.getSharedPreferences("manboData", MODE_PRIVATE);
+        dataSp.edit().putString("greeting", mainGreeting).apply();
+        dataSp.edit().putString("version", andVersion).apply();
+
+
+        //생각 좀 해야함
+        ((homeFragment) homeFragment.mStaticHFContext).fetchGreetingText(mainGreeting);
+//        ((settingFragment) settingFragment.mStaticSFContext).fetchVersionText(andVersion);
+
+    }
 
 }

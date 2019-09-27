@@ -1,5 +1,6 @@
 package com.colorworld.manbocash.mainFragments;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,11 @@ public class storeFragment extends Fragment {
         mStoreWebView.getSettings().setDomStorageEnabled(true);
         mStoreWebView.setWebChromeClient(new WebChromeClient());
         mStoreWebView.setWebViewClient(new WebViewClient());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mStoreWebView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
 
         mStoreWebView.loadUrl("https://dev.giftting.co.kr:4433/gate.jsp?mdcode=testw&type=M");
 
