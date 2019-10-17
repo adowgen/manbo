@@ -20,6 +20,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
@@ -38,11 +39,18 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
     //test
     private boolean isView = false;
+    FirebaseAuth auth ;
 
 
     @Override
@@ -98,6 +107,14 @@ public class MainActivity extends AppCompatActivity {
 
         mStaticContext = this;
 
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            Log.i("user", "currentUser=> " + currentUser.getDisplayName()+ ", id:" + currentUser.getUid());
+            isView = true;
+
+        }
 
         MobileAds.initialize(this, "ca-app-pub-6561710413911304~8412658551");
 
@@ -413,4 +430,61 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        /* ---- google signout ---- */
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        auth.signOut();
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d("google", "google Signout complete!!");
+            }
+        });
+        /* ------------------------ */
+
+        /* ---- kakao signout ---- */
+        UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+            @Override
+            public void onCompleteLogout() {
+                FirebaseAuth.getInstance().signOut();
+                Log.d("google", "kakao Signout complete!!");
+            }
+        });
+        /* ------------------------ */
+    }
+
+//    @Override
+//    protected void onDestroy() {
+//
+//
+//        /* ---- google signout ---- */
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .build();
+//
+//        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+//        auth.signOut();
+//        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                Log.d("google", "google Signout complete!!");
+//            }
+//        });
+//        /* ------------------------ */
+//
+//        /* ---- kakao signout ---- */
+//        UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+//            @Override
+//            public void onCompleteLogout() {
+//                FirebaseAuth.getInstance().signOut();
+//            }
+//        });
+//        /* ------------------------ */
+//    }
 }

@@ -3,7 +3,7 @@
     <string name="app_name">만보캐시</string>
 
     <!--카카오 앱키-->
-    <string name="kakao_app_key">bb7ab942f356d4d5ae1e5f3f5bdccb81</string>
+<!--    <string name="kakao_app_key">bb7ab942f356d4d5ae1e5f3f5bdccb81</string>-->
 
     <!--facebook-->
     <string name="facebook_app_id">2231094120484865</string>

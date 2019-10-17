@@ -61,7 +61,8 @@
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="@string/kakao_app_key" />
+            android:value="33e11a8c137f0f8e8bca14987bbb81b7" />
+<!--            android:value="@string/kakao_app_key" />-->
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

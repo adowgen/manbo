@@ -32,15 +32,22 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.facebook.AccessToken;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.kakao.auth.AuthType;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
@@ -63,19 +70,21 @@ import static com.kakao.util.helper.Utility.getPackageInfo;
 public class TutorialSupportActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static final String KEY_ROLLBACK = "key_rollback";
+    public static final int GOOGLE_SIGN_IN = 1000;
+    public static final int KAKAO_SIGN_IN = 2000;
 
     private Context mContext;
     private Activity mActivity;
     private boolean noRollback;
 
-    public ImageView login_kakao;
+    public com.kakao.usermgmt.LoginButton login_kakao;
     public CallbackManager mCallbackManager;
 
     /*facebook*/
     public LoginButton loginButton;
     private FirebaseAuth mAuth;
     private com.facebook.AccessToken getFacebookAccessToken;
-
+    private GoogleSignInClient mGoogleSignInClient;
 
     Button logoutButton;
 
@@ -115,7 +124,10 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        Log.e("ios", "facebook currentUser : " + currentUser);
+        if (currentUser != null) {
+            Log.e("ios", "onStart currentUser : " + currentUser);
+
+        }
 
     }
 
@@ -131,9 +143,19 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
         Log.e("ios", "hash key : " + getKeyHash(mContext));
 
 
-        login_kakao = (ImageView) findViewById(R.id.ivThirdBtn);
+        login_kakao =  findViewById(R.id.ivFirstBtn);
         login_kakao.setOnClickListener(this);
 
+        /* ---- Google Login ---- */
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("387864702922-aj4n1rm93ulli9cootpiptpuhje9a4nr.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         /*facebook login*/
         mAuth = FirebaseAuth.getInstance();
@@ -162,13 +184,14 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
             }
         });
 
+        findViewById(R.id.ivThirdBtn).setOnClickListener(this);
 
         noRollback = getIntent().getBooleanExtra(KEY_ROLLBACK, false);
 
         if (savedInstanceState == null) {
             replaceTutorialFragment(noRollback);
         }
-
+        Session.getCurrentSession().addCallback(new KakaoSessionCallback());
     }
 
 
@@ -181,8 +204,55 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
         Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data);
 
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
 
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == GOOGLE_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Log.i("google", "onActivityResult");
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleGoogleSignInResult(task);
+        }
+
+    }
+    private void handleGoogleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Signed in successfully, show authenticated UI.
+            Log.i("google", "displayName: "+ account.getDisplayName()+ " id: "+account.getId() + " idToken: "+ account.getIdToken());
+            firebaseAuthWithGoogle(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("google", "signInResult:failed code=" + e.getStatusCode());
+
+        }
+    }
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d("google", "firebaseAuthWithGoogle:" + acct.getId() + "/" + acct.getDisplayName());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("google", "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Log.d("google", "user => "+ user.getUid());
+                            mActivity.finish();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("google", "signInWithCredential:failure", task.getException());
+//                            Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+//                            updateUI(null);
+                        }
+
+                    }
+                });
+    }
 
 
     private void handleFacebookAccessToken(AccessToken token) {
@@ -263,12 +333,9 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
         public void onSessionOpened() {
 
             Session currentSession = Session.getCurrentSession();
-            com.kakao.auth.authorization.accesstoken.AccessToken accessToken = currentSession.getTokenInfo();
+            final com.kakao.auth.authorization.accesstoken.AccessToken accessToken = currentSession.getTokenInfo();
 
 
-            Toast.makeText(mContext, "Successfully logged in to Kakao. Now creating or updating a Firebase User.", Toast.LENGTH_LONG).show();
-
-            Log.e("ios", "Successfully logged in to Kakao. Now creating or updating a Firebase User. token : " + accessToken.getAccessToken());
 
             /*
             *테스트용으로 프로덕트일때는 풀어야됨
@@ -286,7 +353,7 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
                 public Task<AuthResult> then(@NonNull Task<String> task) throws Exception {
                     String firebaseToken = task.getResult();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                    Log.d("Token", "firebaseToken(before signIn): " + firebaseToken);
+                    Log.d("kakao", "firebaseToken(before signIn): " + firebaseToken);
 
                     return auth.signInWithCustomToken(firebaseToken);
                 }
@@ -294,12 +361,18 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
+                        Toast.makeText(mContext, "Successfully logged in to Kakao. Now creating or updating a Firebase User.", Toast.LENGTH_LONG).show();
+
+                        Log.e("ios", "Successfully logged in to Kakao. Now creating or updating a Firebase User. token : " + accessToken.getAccessToken());
+
                         Log.e("ios", "KAKAO session login success");
+                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                        Log.e("kakao", "kakao=> " + currentUser.getDisplayName());
                         mActivity.finish();
                     } else {
                         Toast.makeText(getApplicationContext(), "Failed to create a Firebase user.", Toast.LENGTH_LONG).show();
                         if (task.getException() != null) {
-                            Log.e("ios", task.getException().toString());
+                            Log.e("kakao", task.getException().toString());
                         }
                     }
                 }
@@ -318,7 +391,7 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
 
             if (exception != null) {
                 Toast.makeText(mContext, "exception.toString()", Toast.LENGTH_LONG).show();
-                Log.e("ios", exception.toString());
+                Log.e("kakao", exception.toString());
             }
 
             //지워야됨
@@ -329,18 +402,12 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
+        switch (v.getId())
+        {
             case R.id.ivThirdBtn:
-
-                Log.e("ios", "kakao btn click");
-
-//                login_kakao.setClickable(false);
-
-                Session session = Session.getCurrentSession();
-                session.addCallback(new KakaoSessionCallback());
-                session.open(AuthType.KAKAO_LOGIN_ALL, mActivity);
-
+                googleSignIn();
                 break;
+                default:
         }
     }
 
@@ -351,5 +418,10 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
                 .commit();
     }
 
+    private void googleSignIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
+    }
 
 }
+
