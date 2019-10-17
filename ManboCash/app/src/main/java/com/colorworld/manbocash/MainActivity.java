@@ -9,6 +9,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,6 +38,7 @@ import com.colorworld.manbocash.mainFragments.homeFragment;
 import com.colorworld.manbocash.mainFragments.settingFragment;
 import com.colorworld.manbocash.mainFragments.storeFragment;
 import com.colorworld.manbocash.requestPermission.RequestPermission;
+import com.colorworld.manbocash.tutorial.StepWorker;
 import com.colorworld.manbocash.tutorial.tutorials.TutorialSupportActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -43,10 +49,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.kakao.usermgmt.UserManagement;
@@ -62,6 +72,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -96,26 +109,23 @@ public class MainActivity extends AppCompatActivity {
     //test
     private boolean isView = false;
     FirebaseAuth auth ;
+    private WorkManager mWorkmanager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mContext = getApplicationContext();
-
         mStaticContext = this;
-
         auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
+
 
         if (currentUser != null) {
             Log.i("user", "currentUser=> " + currentUser.getDisplayName()+ ", id:" + currentUser.getUid());
             isView = true;
-
         }
-
         MobileAds.initialize(this, "ca-app-pub-6561710413911304~8412658551");
 
 //        MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -184,6 +194,48 @@ public class MainActivity extends AppCompatActivity {
 
             isView = true;
         }
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                if (currentUser != null) {
+                    // 서버에 UID 저장
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("displayName", currentUser.getDisplayName().toString());
+                    user.put("uid", currentUser.getUid());
+                    user.put("photoUrl", currentUser.getPhotoUrl().toString());
+
+                    db.collection("users").document(currentUser.getUid().toString())
+                            .set(user)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("db", "user saved");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d("db", "user save 실패 :"+ e);
+                                }
+                            });
+
+                    /* -- workManager -- */
+                    Constraints constraints = new Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .setRequiresBatteryNotLow(true)
+                            .build();
+                    mWorkmanager = WorkManager.getInstance((getApplicationContext()));
+                    PeriodicWorkRequest uploadStepRequest = new PeriodicWorkRequest.Builder(StepWorker.class, 15, TimeUnit.MINUTES)
+                            .setConstraints(constraints)
+                            .build();
+                    mWorkmanager.enqueueUniquePeriodicWork("uploadStep", ExistingPeriodicWorkPolicy.REPLACE, uploadStepRequest);
+                    /* ------------------ */
+
+                }
+            }
+        });
 
     }
 

@@ -145,6 +145,7 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
 
         login_kakao =  findViewById(R.id.ivFirstBtn);
         login_kakao.setOnClickListener(this);
+        findViewById(R.id.ivThirdBtn).setOnClickListener(this);
 
         /* ---- Google Login ---- */
         // Configure sign-in to request the user's ID, email address, and basic
@@ -184,7 +185,7 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
             }
         });
 
-        findViewById(R.id.ivThirdBtn).setOnClickListener(this);
+
 
         noRollback = getIntent().getBooleanExtra(KEY_ROLLBACK, false);
 
@@ -268,6 +269,7 @@ public class TutorialSupportActivity extends AppCompatActivity implements View.O
                             Log.e("ios", "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Log.e("ios", "facebook currentUser : " + user);
+                            mActivity.finish();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.e("ios", "signInWithCredential:failure", task.getException());

@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:5.0.0'
     implementation 'com.google.firebase:firebase-config:19.0.2'
+    implementation 'com.google.firebase:firebase-firestore:20.2.0'
 
     implementation 'com.facebook.android:facebook-login:[5,6)'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
@@ -66,7 +67,8 @@ dependencies {
     //구글광고
     implementation 'com.google.firebase:firebase-ads:17.2.0'
 
-
+    // workManager
+    implementation "androidx.work:work-runtime:2.2.0"
 
     // kakao sdk
     implementation group: 'com.kakao.sdk', name: 'usermgmt', version: '1.19.0'
