@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
 
             isView = true;
         }
+
         FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -226,11 +227,11 @@ public class MainActivity extends AppCompatActivity {
                             .setRequiredNetworkType(NetworkType.CONNECTED)
                             .setRequiresBatteryNotLow(true)
                             .build();
-                    mWorkmanager = WorkManager.getInstance((getApplicationContext()));
-                    PeriodicWorkRequest uploadStepRequest = new PeriodicWorkRequest.Builder(StepWorker.class, 15, TimeUnit.MINUTES)
+                    mWorkmanager = WorkManager.getInstance(getApplicationContext());
+                    PeriodicWorkRequest uploadStepRequest = new PeriodicWorkRequest.Builder(StepWorker.class, 1, TimeUnit.HOURS)
                             .setConstraints(constraints)
                             .build();
-                    mWorkmanager.enqueueUniquePeriodicWork("uploadStep", ExistingPeriodicWorkPolicy.REPLACE, uploadStepRequest);
+                    mWorkmanager.enqueueUniquePeriodicWork("uploadStep", ExistingPeriodicWorkPolicy.KEEP, uploadStepRequest);
                     /* ------------------ */
 
                 }
@@ -486,28 +487,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         /* ---- google signout ---- */
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        auth.signOut();
-        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d("google", "google Signout complete!!");
-            }
-        });
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .build();
+//
+//        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+//        auth.signOut();
+//        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                Log.d("google", "google Signout complete!!");
+//            }
+//        });
         /* ------------------------ */
 
         /* ---- kakao signout ---- */
-        UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
-            @Override
-            public void onCompleteLogout() {
-                FirebaseAuth.getInstance().signOut();
-                Log.d("google", "kakao Signout complete!!");
-            }
-        });
+//        UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+//            @Override
+//            public void onCompleteLogout() {
+//                FirebaseAuth.getInstance().signOut();
+//                Log.d("google", "kakao Signout complete!!");
+//            }
+//        });
         /* ------------------------ */
     }
 

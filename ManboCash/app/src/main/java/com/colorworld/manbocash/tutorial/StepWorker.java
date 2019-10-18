@@ -63,9 +63,7 @@ public class StepWorker extends Worker implements SensorEventListener{
         Map<String, Object> stepData = new HashMap<>();
         stepData.put("timestamp", timestamp);
         stepData.put("steps", steps);
-
         CollectionReference stepsRef = db.collection("users").document(uid).collection("steps");
-
         stepsRef.add(stepData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
