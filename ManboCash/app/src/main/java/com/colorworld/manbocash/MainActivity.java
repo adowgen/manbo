@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                     PeriodicWorkRequest uploadStepRequest = new PeriodicWorkRequest.Builder(StepWorker.class, 1, TimeUnit.HOURS)
                             .setConstraints(constraints)
                             .build();
-                    mWorkmanager.enqueueUniquePeriodicWork("uploadStep", ExistingPeriodicWorkPolicy.KEEP, uploadStepRequest);
+                    mWorkmanager.enqueueUniquePeriodicWork("uploadStep", ExistingPeriodicWorkPolicy.REPLACE, uploadStepRequest);
                     /* ------------------ */
 
                 }

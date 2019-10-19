@@ -13,6 +13,7 @@ import androidx.work.WorkerParameters;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -61,7 +62,7 @@ public class StepWorker extends Worker implements SensorEventListener{
         FirebaseUser user =  FirebaseAuth.getInstance().getCurrentUser();
         String uid = user.getUid();
         Map<String, Object> stepData = new HashMap<>();
-        stepData.put("timestamp", timestamp);
+        stepData.put("timestamp", Timestamp.now() );
         stepData.put("steps", steps);
         CollectionReference stepsRef = db.collection("users").document(uid).collection("steps");
         stepsRef.add(stepData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
