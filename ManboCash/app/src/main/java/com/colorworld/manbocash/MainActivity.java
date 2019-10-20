@@ -222,17 +222,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
 
-                    /* -- workManager -- */
-                    Constraints constraints = new Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .setRequiresBatteryNotLow(true)
-                            .build();
-                    mWorkmanager = WorkManager.getInstance(getApplicationContext());
-                    PeriodicWorkRequest uploadStepRequest = new PeriodicWorkRequest.Builder(StepWorker.class, 1, TimeUnit.HOURS)
-                            .setConstraints(constraints)
-                            .build();
-                    mWorkmanager.enqueueUniquePeriodicWork("uploadStep", ExistingPeriodicWorkPolicy.REPLACE, uploadStepRequest);
-                    /* ------------------ */
+
 
                 }
             }

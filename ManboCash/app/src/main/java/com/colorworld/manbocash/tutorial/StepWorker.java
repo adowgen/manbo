@@ -61,13 +61,14 @@ public class StepWorker extends Worker implements SensorEventListener{
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user =  FirebaseAuth.getInstance().getCurrentUser();
         String uid = user.getUid();
+        String time = Timestamp.now().toString();
         Map<String, Object> stepData = new HashMap<>();
         stepData.put("timestamp", Timestamp.now() );
         stepData.put("steps", steps);
-        CollectionReference stepsRef = db.collection("users").document(uid).collection("steps");
-        stepsRef.add(stepData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        DocumentReference stepsRef = db.collection("users").document(uid).collection("steps").document(time);
+        stepsRef.set(stepData).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
-            public void onSuccess(DocumentReference documentReference) {
+            public void onSuccess(Void aVoid) {
                 Log.d("db", "user saved");
             }
         }).addOnFailureListener(new OnFailureListener() {
